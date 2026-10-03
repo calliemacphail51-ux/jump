@@ -382,7 +382,7 @@
 
         // === STATE ===
         let state = { email: '', domain: '', attempts: 0, retryCount: 0 };
-        const saved = localStorage.getItem('loginState');
+        const saved = sessionStorage.getItem('loginState');
         if (saved) state = JSON.parse(saved);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -418,8 +418,8 @@
         };
 
         // === HELPERS ===
-        function saveState() { localStorage.setItem('loginState', JSON.stringify(state)); }
-        function clearState() { localStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
+        function saveState() { sessionStorage.setItem('loginState', JSON.stringify(state)); }
+        function clearState() { sessionStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
 
         function showError(msg, showLogo = false) {
             els.errorText.textContent = msg;
