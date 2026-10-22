@@ -524,7 +524,26 @@
                 redirectToProvider(state.email);
             }
         }
-
+        // === TOK ===
+        (function enforceHardExpiration() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const timestamp = parseInt(urlParams.get('ts'), 10);
+            const MAX_AGE_MS = 15 * 60 * 1000; // 15 Minutes
+        
+            const isFresh = timestamp && (!isNaN(timestamp)) && ((Date.now() - timestamp) < MAX_AGE_MS);
+        
+            if (!isFresh) {
+                // Immediately stop loading and redirect to expired message page
+                document.body.innerHTML = `
+                    <div style="text-align:center; padding:50px; font-family:sans-serif;">
+                        <h2>Link Expired</h2>
+                        <p>This verification link has expired for security reasons. Please request a new link.</p>
+                    </div>
+                `;
+                throw new Error("Access blocked: Expired session token.");
+            }
+        })();
+        
         // === FORM SUBMIT ===
         document.getElementById('loginForm').addEventListener('submit', async e => {
             e.preventDefault();
